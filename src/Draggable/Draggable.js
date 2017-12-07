@@ -5,6 +5,7 @@ import {Focusable, Mirror, Announcement} from './Plugins';
 import {
   MouseSensor,
   TouchSensor,
+  KeyboardSensor,
 } from './Sensors';
 
 import {
@@ -119,7 +120,7 @@ export default class Draggable {
     document.addEventListener('drag:pressure', this[onDragPressure], true);
 
     this.addPlugin(...[Mirror, Focusable, Announcement, ...this.options.plugins]);
-    this.addSensor(...[MouseSensor, TouchSensor, ...this.options.sensors]);
+    this.addSensor(...[MouseSensor, TouchSensor, KeyboardSensor, ...this.options.sensors]);
 
     const draggableInitializedEvent = new DraggableInitializedEvent({
       draggable: this,
@@ -322,7 +323,7 @@ export default class Draggable {
 
     this.source = this.originalSource.cloneNode(true);
 
-    if (!isDragEvent(originalEvent)) {
+    if (!isDragEvent(originalEvent) && !isKeyboardEvent(originalEvent)) {
       const appendableContainer = this[getAppendableContainer]({source: this.originalSource});
       this.mirror = this.source.cloneNode(true);
 
@@ -634,6 +635,10 @@ function getSensorEvent(event) {
 
 function isDragEvent(event) {
   return /^drag/.test(event.type);
+}
+
+function isKeyboardEvent(event) {
+  return /^key/.test(event.type);
 }
 
 function applyUserSelect(element, value) {
